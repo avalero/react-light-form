@@ -1,21 +1,28 @@
-import { InputHTMLAttributes, useState } from "react";
+import { InputHTMLAttributes, useContext, useState } from "react";
 import { get } from "../lib/utils";
-import { FormData, FormEventsFunctions, ValidateData } from "./Form";
+import {
+  FormContext,
+  FormData,
+  FormEventsFunctions,
+  ValidateData,
+} from "./Form";
 
-type CustoInputProps = {
+type CustomInputProps = {
   label: string;
 };
 
 const Input = <T extends object, Y>(
   props: FormData<T> &
     InputHTMLAttributes<HTMLInputElement> &
-    CustoInputProps &
+    CustomInputProps &
     ValidateData<Y>
 ) => {
-  const [value, setValue] = useState<Y>(get(props.dataRef, props.path));
+  const dataRef = useContext(FormContext) as React.MutableRefObject<T>;
+  const { path, validation, label, ...itemProps } = props;
+
+  const [value, setValue] = useState<Y>(get(dataRef, props.path));
   const [error, setError] = useState<boolean>(false);
 
-  const { dataRef, path, validation, label, ...itemProps } = props;
   return (
     <>
       <span>{label}</span>

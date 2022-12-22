@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC, PropsWithChildren } from "react";
 import { set } from "../lib/utils";
 
 /**
@@ -24,7 +24,6 @@ export type ValidateData<Y> = {
 };
 
 export type FormData<T extends object> = {
-  dataRef: React.MutableRefObject<T>;
   path: NestedKeyOf<T>;
 };
 
@@ -69,3 +68,23 @@ export type SelectOptions = {
     value: string;
   }>;
 };
+
+function createDataContext<T extends object>() {
+  return React.createContext({} as React.MutableRefObject<T>);
+}
+
+export const FormContext = createDataContext();
+
+function createFormComponent<T extends object>() {
+  return function FormComponent(
+    props: PropsWithChildren<{ dataRef: React.MutableRefObject<T> }>
+  ) {
+    return (
+      <FormContext.Provider value={props.dataRef}>
+        {props.children}
+      </FormContext.Provider>
+    );
+  };
+}
+
+export const Form = createFormComponent();
