@@ -3,6 +3,8 @@ import { Locations, UserDetails } from "../types";
 import { Form, FormIntemEvents } from "./Form";
 import Input from "./Input";
 import Select from "./Select";
+import styled from "@emotion/styled";
+import StyledInput from "./StyledInput";
 
 export const FormExample: FC<{ data: UserDetails }> = (props) => {
   const data = useRef<UserDetails>(props.data);
@@ -10,7 +12,8 @@ export const FormExample: FC<{ data: UserDetails }> = (props) => {
   return (
     <>
       <Form dataRef={data}>
-        <Input<UserDetails, string>
+        <StyledInput<UserDetails, string>
+          CustomComponent={MyStyledInput}
           type="text"
           label="User"
           name="user"
@@ -52,3 +55,11 @@ export const FormExample: FC<{ data: UserDetails }> = (props) => {
     </>
   );
 };
+
+const MyStyledInput = styled(Input)`
+  background-color: #7a788f;
+  color: white;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 10px;
+`;
