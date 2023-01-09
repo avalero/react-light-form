@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 import { set } from "../lib/utils";
 
 /**
@@ -17,8 +17,8 @@ export enum FormIntemEvents {
 
 export type ValidateData<Y> = {
   validation?: {
-    errorMessage: string;
-    validateFunction: (value: Y, other?: unknown) => boolean;
+    errorMessages: string[];
+    validateFunctions: Array<(value: Y, other?: unknown) => boolean>;
     validateOn: FormIntemEvents[];
   };
 };
@@ -31,32 +31,35 @@ export function FormEventsFunctions<T extends object, Y>(params: {
   dataRef: React.MutableRefObject<T>;
   path: NestedKeyOf<T>;
   setValue: React.Dispatch<React.SetStateAction<Y>>;
-  setError: React.Dispatch<React.SetStateAction<boolean>>;
+  setErrors: React.Dispatch<React.SetStateAction<string[]>>;
   validate: ValidateData<Y>;
 }) {
-  const { setValue, setError, dataRef, path, validate } = params;
+  const { setValue, setErrors, dataRef, path, validate } = params;
   const { validation } = validate;
+
+  const checkErrors = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const errors: string[] = [];
+    if (validation) {
+      validation.validateFunctions.forEach((validateFunction, index) => {
+        if (!validateFunction(e.target.value as Y)) {
+          errors.push(validation.errorMessages[index]);
+        }
+      });
+    }
+    setErrors(errors);
+  };
   return {
     onChange: (e: React.ChangeEvent<HTMLInputElement>): void => {
       setValue(e.target.value as Y);
       set<T>(dataRef, path, e.target.value);
       if (validation?.validateOn.includes(FormIntemEvents.onChange)) {
-        if (validation.validateFunction(e.target.value as Y)) {
-          setError(false);
-        } else {
-          setError(true);
-        }
+        checkErrors(e);
       }
     },
     onBlur: (e: React.ChangeEvent<HTMLInputElement>): void => {
       set<T>(dataRef, path, e.target.value);
       if (validation?.validateOn.includes(FormIntemEvents.onBlur)) {
-        if (validation.validateFunction(e.target.value as Y)) {
-          setError(false);
-          // set dataRef Value
-        } else {
-          setError(true);
-        }
+        checkErrors(e);
       }
     },
   };

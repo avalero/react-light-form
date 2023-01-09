@@ -23,8 +23,14 @@ export const FormExample: FC<{ data: UserDetails }> = (props) => {
           label="Age"
           path="age"
           validation={{
-            errorMessage: "You must be at least 18 years old",
-            validateFunction: (value) => Number(value) >= 18,
+            errorMessages: [
+              "You must be at least 18 years old",
+              "You must be younger than 60",
+            ],
+            validateFunctions: [
+              (value) => Number(value) >= 18,
+              (value) => Number(value) < 60,
+            ],
             validateOn: [FormIntemEvents.onBlur],
           }}
         />

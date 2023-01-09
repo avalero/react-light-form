@@ -21,7 +21,7 @@ const Input = <T extends object, Y>(
   const { path, validation, label, ...itemProps } = props;
 
   const [value, setValue] = useState<Y>(get(dataRef, props.path));
-  const [error, setError] = useState<boolean>(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
   return (
     <>
@@ -30,14 +30,14 @@ const Input = <T extends object, Y>(
         value={value as string | number | readonly string[] | undefined}
         {...FormEventsFunctions<T, Y>({
           setValue,
-          setError,
+          setErrors,
           dataRef,
           path: path as any,
           validate: { validation },
         })}
         {...itemProps}
       />
-      {error && <span>{validation?.errorMessage}</span>}
+      {errors.length > 0 && <span>{errors.join("-")}</span>}
     </>
   );
 };
